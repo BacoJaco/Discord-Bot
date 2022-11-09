@@ -5,7 +5,7 @@ import random
 import requests
 import json
 import asyncio
-
+#hello
 intents = discord.Intents.all()
 
 helpCommand = commands.DefaultHelpCommand(no_catergory='Commands')
@@ -20,20 +20,20 @@ async def on_connect():
 
 
 
-@bot.command()
-async def hello(ctx):
-  await ctx.reply("Hello!")
+#@bot.command()
+#async def hello(ctx):
+#  await ctx.reply("Hello!")
 
-@bot.command()
-async def name(ctx, name):
-  await ctx.reply("Hello " + name + ", nice to meet you!")
+#@bot.command()
+#async def name(ctx, name):
+#  await ctx.reply("Hello " + name + ", nice to meet you!")
 
-@bot.command()
+@bot.command(brief = "Put two numbers after the command to add them")
 async def add(ctx, numOne, numTwo):
   solu = int(numOne) + int(numTwo)
   await ctx.reply("The solution to " + str(numOne) + " + " + str(numTwo) + " is " + str(solu))
 
-@bot.command()
+@bot.command(brief = "Put in a time, such as 8 am, to get a greeting based on it")
 async def time(ctx, time, period):
   if period.lower() == "am" and int(time) >= 5:
     await ctx.reply("Good morning!")
@@ -47,23 +47,23 @@ async def time(ctx, time, period):
     await ctx.reply("Good Night!")
 
    
-@bot.command()
-async def image(ctx):
-  await ctx.reply("https://miro.medium.com/max/960/1*kv9wKHnCwVhXWSUp4Luw_g.jpeg")
+#@bot.command()
+#async def image(ctx):
+#  await ctx.reply("https://miro.medium.com/max/960/1*kv9wKHnCwVhXWSUp4Luw_g.jpeg")
 
-@bot.command()
+@bot.command(brief = "This will output a random image of an oversized 'rubber' duck")
 async def randomImage(ctx):
   num = random.randint(0, 6)
   imageAddress = imageList[num]
   await ctx.reply(imageAddress)
 
-@bot.command()
+@bot.command(brief = "Ask a question to recieve a mystical answer")
 async def eightBall(ctx, *, phrase: str):
   ansList = [": **It is certain.**", ": **It is decidedly so.**", ": **Without a doubt.**", ": **Yes definitely.**", ": **You may rely on it.**", ": **As I see it, yes.**", ": **Most likely.**", ": **Outlook good.**", ": **Yes.**", ": **Signs point to yes.**", ": **Reply hazy, try again.**", ": **Ask again later.**", ": **Better not tell you now.**", ": **Cannot predict now.**", ": **Concentrate and ask again.**", ": **Don't count on it.**", ": **My reply is no.**", ": **My sources say no.**", ": **Outlook not so good.**", ": **Very doubtful.**"]
   ball = random.randint(0, 19)
   await ctx.reply(phrase + ansList[ball])
 
-@bot.command(aliases = ["rps", "Rps"])
+@bot.command(brief = "Type either rock, paper, or scissors to play", aliases = ["rps", "Rps"])
 async def RPS(ctx, choice):
   choiceList = ["rock", "paper", "scissors"]
   choice = choice.lower()
@@ -102,7 +102,7 @@ async def RPS(ctx, choice):
 #  await ctx.send(weather + ", " + str(temp) + " degrees F")
 
 
-@bot.command()
+@bot.command(brief = "Type either 'multiple' or 'boolean' for multiple choice or true/false trivia")
 async def trivia(ctx, type):
   url = "https://opentdb.com/api.php?amount=1&category=9&difficulty=medium&type=" + type
   req = requests.get(url)
@@ -129,7 +129,7 @@ async def trivia(ctx, type):
     #else:
     #  await ctx.send("Wrong")
 
-@bot.command()
+@bot.command(brief = "Get random facts about a specific number")
 async def number(ctx, num):
   url = "http://numbersapi.com/" + str(num) + "?json"
   req = requests.get(url)
