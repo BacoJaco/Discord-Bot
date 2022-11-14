@@ -77,7 +77,8 @@ async def RPS(ctx, choice):
 #Trivia
 @bot.command(brief = "Type either 'multiple' or 'boolean' for multiple choice or true/false trivia")
 async def trivia(ctx, type):
-  url = "https://opentdb.com/api.php?amount=1&category=9&difficulty=medium&type=" + type
+  triviaKey = os.environ['triviaKey']
+  url = "https://opentdb.com/api.php?amount=1&category=9&difficulty=medium&type=" + type + "&key=" + triviaKey
   req = requests.get(url)
   data = req.json()
   question = data["results"][0]["question"]
