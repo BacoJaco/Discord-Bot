@@ -3,14 +3,27 @@ import discord
 from discord.ext import commands
 import random
 import requests
-import json
 import asyncio
+#import music
+from dotenv import load_dotenv
+import youtube_dl
+
 
 intents = discord.Intents.all()
 
 helpCommand = commands.DefaultHelpCommand(no_catergory='Commands')
 
 bot = commands.Bot(command_prefix='.j ', intents=intents)
+
+#cogs = [music]
+
+#async def cogs():
+#  for i in range(len(cogs)):
+#    cogs[i].setup(bot)
+
+  #for extension in cogs:
+  #  bot.load_extension(extension)
+  #  return
 
 imageList = ["https://miro.medium.com/max/960/1*kv9wKHnCwVhXWSUp4Luw_g.jpeg", "https://lp-cms-production.imgix.net/news/2017/06/GettyImages-538072290.jpg?auto=format&q=40&w=870&dpr=1", "https://media.nbcdfw.com/2021/07/GettyImages-888695410.jpg?quality=85&strip=all&resize=850%2C478", "https://cdntdreditorials2.azureedge.net/cache/c/2/8/e/9/6/c28e96f74b0a4672849199f3dafc16c46625457c.jpg", "https://i2.wp.com/nationaleconomicseditorial.com/wp-content/uploads/41bf0c3e58099d42176b2d327e6740a2.jpg?resize=678%2C381&ssl=1", "https://globalnews.ca/wp-content/uploads/2017/06/rubber-duck-e1507834750438.jpg?quality=85&strip=all&w=650&h=379&crop=1", "https://www.flare.com/wp-content/uploads/2017/05/Giant-rubber-duck-for-Canada-150-inline.jpg"]
 
@@ -108,8 +121,51 @@ async def number(ctx, num):
   data = req.json()
   fact = data["text"]
   await ctx.send(fact)
+  
+
+#Music Player
+@bot.command()
+async def play(ctx, url):
+  if ctx.voice_client is None:
+    await ctx.author.voice.channel.connect()
+  else:
+    ctx.voice_client.stop()
+  FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed -reconnect_delay_max 5', 'options':'-vn'}
+  YDL_OPTIONS={'format':"bestaudio"}
+  vc = ctx.voice_client
+
+  with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
+    info = ydl.extract_info(url, download = False)
+  url2 = info['formats'][0]['url']
+  source = await discord.FFmpegOpusAudio.from_probe(url2,#**FFMPEG_OPTIONS
+                                                   )
+  vc.play(source)
+
+@bot.command()
+async def stop(ctx):
+  await ctx.voice_client.disconnect()
+
+  
 
 
+
+
+
+#@bot.command(brief = "Play a song of your choice")
+#async def play(ctx, song):
+  
+#some funny code here
+#  voice = ctx.member.voice
+ # if voice is None:
+ #   await ctx.send("You need to be in a voice channel to use this command")
+ # channel =  ctx.author.voice.channel
+ # await channel.connect()
+  
+
+#Stop Music
+#@bot.command(brief = "End any music playing")
+#async def stop(ctx):
+#  await ctx.voice_client.disconnect()
 
 token = os.environ['token']
 bot.run(token)
