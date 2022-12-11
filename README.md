@@ -25,4 +25,5 @@ Its current functions include:
 .j number: Returns a fun fact about the given number
 
 .j play: Put in a YouTube URL to have the bot join a voice channel and play music. Pause/Resume functions are buttons that appear when a song is playing
+
 .j stop: Have the bot disconnect from the voice channel and stop playback
