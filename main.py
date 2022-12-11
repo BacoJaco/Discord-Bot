@@ -1,6 +1,7 @@
 import os
 import discord
 from discord.ext import commands
+from discord.ui import Button, View
 import random
 import requests
 import asyncio
@@ -124,24 +125,53 @@ async def number(ctx, num):
   
 
 #Music Player
-@bot.command()
+@bot.command(brief = "Put in a YouTube link to play any song of your choice")
 async def play(ctx, url):
   if ctx.voice_client is None:
     await ctx.author.voice.channel.connect()
   else:
     ctx.voice_client.stop()
+    await ctx.send("Not connected to a channel")
   FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed -reconnect_delay_max 5', 'options':'-vn'}
   YDL_OPTIONS={'format':"bestaudio"}
   vc = ctx.voice_client
 
   with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
     info = ydl.extract_info(url, download = False)
+    video_title = info.get('title', None)
   url2 = info['formats'][0]['url']
   source = await discord.FFmpegOpusAudio.from_probe(url2,#**FFMPEG_OPTIONS
                                                    )
+  button1 = Button(label = "Pause ⏸️")
+  async def pauseClicked(interaction):
+    try:
+      ctx.voice_client.pause()
+      await interaction.response.send_message("**Paused**")
+    except:
+      await interaction.response.send_message("No music to pause")
+    
+  button2= Button(label = "Resume ▶️")
+  async def playClicked(interaction):
+    try:
+      ctx.voice_client.resume()
+      await interaction.response.send_message("**Resumed**")
+    except:
+      await interaction.response.send_message("No music to resume")
+
+
+  button1.callback = pauseClicked
+  button2.callback = playClicked
+
+  view = View()
+  view.add_item(button1)
+  view.add_item(button2)
+  
+  await ctx.send("**Now Playing: **" + video_title, view=view)
   vc.play(source)
 
-@bot.command()
+  
+
+@bot.command(brief = "Disconnect the bot from a voice channel and stop music playback")
 async def stop(ctx):
   await ctx.voice_client.disconnect()
 
