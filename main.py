@@ -6,6 +6,8 @@ import random
 import requests
 import asyncio
 import youtube_dl
+from constant import keep_alive
+import urllib.parse, urllib.request, re
 
 intents = discord.Intents.all()
 #Help Menu
@@ -112,7 +114,7 @@ async def number(ctx, num):
 
 #Music Player
 @bot.command(brief = "Put in a YouTube link to play any song of your choice")
-async def play(ctx, url):
+async def play(ctx, *, url):
   #Connecting to user channel
   voiceState = ctx.author.voice
   if voiceState is None:
@@ -121,6 +123,24 @@ async def play(ctx, url):
     await ctx.author.voice.channel.connect()
   else:
     ctx.voice_client.stop()
+  
+  #Generate link
+  if not ("youtube.com/watch?" in url or "https://youtu.be/" in url):
+    query_string = urllib.parse.urlencode({
+      'search_query': url
+    })
+    html_content = urllib.request.urlopen(
+      'https://www.youtube.com/results?' + query_string
+    )
+    search_results = re.findall(r"watch\?v=(\S{11})",html_content.read().decode())
+    url = 'https://www.youtube.com/watch?v=' + search_results[0]
+    YDL_OPTIONS={'format':"bestaudio"}
+    vc = ctx.voice_client
+    with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
+      info = ydl.extract_info(url, download = False)
+      video_title = info.get('title', None)
+    url2 = info['formats'][0]['url']
+    source = await discord.FFmpegOpusAudio.from_probe(url2)
   
   #Getting YouTube data 
   YDL_OPTIONS={'format':"bestaudio"}
@@ -152,7 +172,7 @@ async def play(ctx, url):
   view = View()
   view.add_item(button1)
   view.add_item(button2)
-  await ctx.send("**Now Playing: **" + video_title, view=view)
+  await ctx.send("**Now Playing: **" + video_title + " **(Type '.j stop' to end playback)**", view=view)
   
   #Returning music data+buttons
   vc.play(source)
@@ -161,8 +181,9 @@ async def play(ctx, url):
 async def stop(ctx):
   await ctx.voice_client.disconnect()
   await ctx.send("**Disconnected**")
-
+  
 
 #Connect Bot
+keep_alive()
 token = os.environ['token']
 bot.run(token)
